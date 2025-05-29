@@ -44,8 +44,8 @@ Below are some screenshots of the application, showcasing the main features and 
 #### 🏠 Welcome Page / Main Menu
 
 ![Welcome Page](https://github.com/user-attachments/assets/1038cbbf-9c92-446e-994c-4278591de38d)
-![Main Menu](https://github.com/user-attachments/assets/e2995d23-1518-4e4d-b8dd-62fe74ecab34)
 
+![Main Menu](https://github.com/user-attachments/assets/e2995d23-1518-4e4d-b8dd-62fe74ecab34)
 
 #### 👥 Client Registration
 ![Client Registration](https://github.com/user-attachments/assets/f31785f6-7b4b-41b8-be68-97bc9093344b)
@@ -56,9 +56,3 @@ Below are some screenshots of the application, showcasing the main features and 
 #### ⚙️ Administration Menu
 ![Admin Menu](https://github.com/user-attachments/assets/237c3214-579d-44f1-a667-f3f886eea3eb)
 
-
-
-
-
-
-![Captura de ecrã 2025-05-29 142529]
