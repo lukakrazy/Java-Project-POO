@@ -1,0 +1,72 @@
+name: Send POST Request with Custom Inputs
+
+on:
+  workflow_dispatch:
+    inputs:
+      var1:
+        description: 'Selecione uma opção'
+        required: true
+        type: choice
+        options:
+          - option1
+          - option2
+          - option3
+        default: 'option1'
+
+      var2:
+        description: 'Valor string para var2'
+        required: true
+        type: string
+        default: ''
+
+      var3:
+        description: 'Valor string para var3'
+        required: true
+        type: string
+        default: ''
+
+jobs:
+  send-post-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create JSON payload and send POST request
+        env:
+          TOKEN: ${{ secrets.API_TOKEN }}
+          API_KEY: ${{ secrets.API_KEY }}
+          VAR1: ${{ inputs.var1 }}
+          VAR2: ${{ inputs.var2 }}
+          VAR3: ${{ inputs.var3 }}
+        run: |
+          # Criar o JSON payload
+          JSON_PAYLOAD=$(cat <<EOF
+          {
+            "var1": "$VAR1",
+            "var2": "$VAR2",
+            "var3": "$VAR3"
+          }
+          EOF
+          )
+          
+          echo "JSON Payload criado:"
+          echo "$JSON_PAYLOAD"
+          
+          # Mostrar informações do request que seria enviado (TESTE)
+          echo "==============================================="
+          echo "🧪 MODO TESTE - Request que seria enviado:"
+          echo "==============================================="
+          echo "URL: https://www.test.pt/t1"
+          echo "Method: POST"
+          echo "Headers:"
+          echo "  Content-Type: application/json"
+          echo "  Authorization: Bearer $TOKEN"
+          echo "  X-API-Key: $API_KEY"
+          echo ""
+          echo "Payload JSON:"
+          echo "$JSON_PAYLOAD"
+          echo "==============================================="
+          echo "✅ Teste concluído! Dados preparados para envio."
+          echo "📝 Para enviar realmente, substitua esta secção pelo código curl."
