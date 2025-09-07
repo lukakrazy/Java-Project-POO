@@ -1,21 +1,26 @@
-name: Send POST Request with Custom Inputs
+name: Send POST Request with Checkbox Inputs
 
 on:
   workflow_dispatch:
     inputs:
-      var1:
-        description: 'Selecione uma opção'
-        required: true
-        type: choice
-        options:
-          - option1
-          - option2
-          - option3
-        default: 'option1'
+      var1_option1:
+        description: 'Incluir option1?'
+        type: boolean
+        default: false
+
+      var1_option2:
+        description: 'Incluir option2?'
+        type: boolean
+        default: false
+
+      var1_option3:
+        description: 'Incluir option3?'
+        type: boolean
+        default: false
 
       var2:
-        description: 'Valor string para var2'
-        required: true
+        description: 'Valor string para var2 (ignorado se só option1 estiver selecionado)'
+        required: false
         type: string
         default: ''
 
@@ -30,22 +35,67 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Create JSON payload and send POST request
         env:
           TOKEN: ${{ secrets.API_TOKEN }}
           API_KEY: ${{ secrets.API_KEY }}
-          VAR1: ${{ inputs.var1 }}
+          VAR1_OPTION1: ${{ inputs.var1_option1 }}
+          VAR1_OPTION2: ${{ inputs.var1_option2 }}
+          VAR1_OPTION3: ${{ inputs.var1_option3 }}
           VAR2: ${{ inputs.var2 }}
           VAR3: ${{ inputs.var3 }}
         run: |
+          # Processar as opções selecionadas
+          VAR1_ARRAY=()
+          SELECTED_COUNT=0
+          
+          if [[ "$VAR1_OPTION1" == "true" ]]; then
+            VAR1_ARRAY+=("option1")
+            SELECTED_COUNT=$((SELECTED_COUNT + 1))
+          fi
+          
+          if [[ "$VAR1_OPTION2" == "true" ]]; then
+            VAR1_ARRAY+=("option2")
+            SELECTED_COUNT=$((SELECTED_COUNT + 1))
+          fi
+          
+          if [[ "$VAR1_OPTION3" == "true" ]]; then
+            VAR1_ARRAY+=("option3")
+            SELECTED_COUNT=$((SELECTED_COUNT + 1))
+          fi
+          
+          # Verificar se pelo menos uma opção foi selecionada
+          if [[ ${#VAR1_ARRAY[@]} -eq 0 ]]; then
+            echo "❌ Erro: Pelo menos uma opção deve ser selecionada!"
+            exit 1
+          fi
+          
+          # Lógica condicional para VAR2
+          if [[ ${#VAR1_ARRAY[@]} -eq 1 && "$VAR1_OPTION1" == "true" ]]; then
+            # Se só option1 estiver selecionado, usar valor fixo
+            FINAL_VAR2="lukatestecerto"
+            echo "🔧 Só option1 selecionado - var2 será: $FINAL_VAR2"
+          else
+            # Caso contrário, usar o valor fornecido
+            FINAL_VAR2="$VAR2"
+            echo "📝 Usando var2 fornecido: $FINAL_VAR2"
+          fi
+          
+          # Criar array JSON para var1
+          VAR1_JSON_ARRAY=""
+          for i in "${!VAR1_ARRAY[@]}"; do
+            if [[ $i -eq 0 ]]; then
+              VAR1_JSON_ARRAY="\"${VAR1_ARRAY[i]}\""
+            else
+              VAR1_JSON_ARRAY="$VAR1_JSON_ARRAY, \"${VAR1_ARRAY[i]}\""
+            fi
+          done
+          
           # Criar o JSON payload
           JSON_PAYLOAD=$(cat <<EOF
           {
-            "var1": "$VAR1",
-            "var2": "$VAR2",
+            "var1": [$VAR1_JSON_ARRAY],
+            "var2": "$FINAL_VAR2",
             "var3": "$VAR3"
           }
           EOF
